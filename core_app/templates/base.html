@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} | AnsarKin</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<header class="top-header">
+    <div class="header-inner">
+        <a href="{% url 'home_page' %}" class="header-logo"><em>Ansar</em>Kin</a>
+
+        <nav class="header-nav">
+            <a href="{% url 'home_page' %}" class="hnav-item {% if request.resolver_match.url_name == 'home_page' %}active{% endif %}">Главная</a>
+            <a href="{% url 'all_ads_page' %}" class="hnav-item {% if request.resolver_match.url_name == 'all_ads_page' %}active{% endif %}">Объявления</a>
+            <a href="{% url 'search_page' %}" class="hnav-item {% if request.resolver_match.url_name == 'search_page' or request.resolver_match.url_name == 'search_results' %}active{% endif %}">Поиск</a>
+            {% if categories %}
+            <div class="hnav-dropdown">
+                <span class="hnav-item hnav-cats-btn">Категории ▾</span>
+                <div class="hnav-dropdown-menu">
+                    {% for category in categories %}
+                    <a href="{% url 'ads_by_category' pk=category.pk %}" class="hnav-drop-item {% if request.resolver_match.url_name == 'ads_by_category' and request.resolver_match.kwargs.pk == category.pk %}active{% endif %}">
+                        {% if category.name == 'Электроника' %}📱{% elif category.name == 'Авто' %}🚗{% elif category.name == 'Недвижимость' %}🏠{% elif category.name == 'Одежда' %}👗{% elif category.name == 'Мебель' %}🛋{% elif category.name == 'Работа' %}💼{% elif category.name == 'Услуги' %}🔧{% elif category.name == 'Животные' %}🐾{% elif category.name == 'Спорт' %}⚽{% else %}📦{% endif %}
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </nav>
+
+        <div class="header-right">
+            <form action="{% url 'search_results' %}" method="get" class="header-search">
+                <input name="q" type="text" placeholder="Поиск..." value="{{ request.GET.q }}">
+                <button type="submit">🔍</button>
+            </form>
+
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile_page' %}" class="header-user-btn">
+                <span class="header-ava">{{ user.first_name|first|default:user.username|first|upper }}</span>
+                <span class="header-username">{{ user.first_name|default:user.username }}</span>
+            </a>
+            <a href="{% url 'logout_view' %}" class="btn-header-ghost">Выйти</a>
+            {% else %}
+            <a href="{% url 'login_page' %}" class="btn-header-ghost">Войти</a>
+            <a href="{% url 'register_page' %}" class="btn-header-accent">Регистрация</a>
+            {% endif %}
+            <a href="{% url 'ad_create' %}" class="btn-header-post">＋ Подать</a>
+        </div>
+
+        <button class="burger-btn" id="burgerBtn">☰</button>
+    </div>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="{% url 'home_page' %}" class="mm-item">🏠 Главная</a>
+        <a href="{% url 'all_ads_page' %}" class="mm-item">📋 Объявления</a>
+        <a href="{% url 'search_page' %}" class="mm-item">🔍 Поиск</a>
+        {% if categories %}{% for category in categories %}
+        <a href="{% url 'ads_by_category' pk=category.pk %}" class="mm-item mm-cat">{{ category.name }}</a>
+        {% endfor %}{% endif %}
+        <div class="mm-divider"></div>
+        {% if user.is_authenticated %}
+        <a href="{% url 'profile_page' %}" class="mm-item">👤 {{ user.first_name|default:user.username }}</a>
+        <a href="{% url 'logout_view' %}" class="mm-item">↩ Выйти</a>
+        {% else %}
+        <a href="{% url 'login_page' %}" class="mm-item">👤 Войти</a>
+        <a href="{% url 'register_page' %}" class="mm-item">✨ Регистрация</a>
+        {% endif %}
+        <a href="{% url 'ad_create' %}" class="mm-post">＋ Подать объявление</a>
+    </div>
+</header>
+
+<div class="page-wrapper">
+    {% if messages %}
+    <div class="msgs-wrap">
+        {% for m in messages %}
+        <div class="msg msg-{% if m.tags == 'success' %}success{% else %}error{% endif %}">
+            {% if m.tags == 'success' %}✅{% else %}❌{% endif %} {{ m }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer-bar">
+        <span class="footer-logo"><em>Ansar</em>Kin</span>
+        <span class="footer-copy">&copy; AnsarKin 2026 · Кинжегулов Ансар</span>
+    </footer>
+</div>
+
+<script src="{% static 'js/main.js' %}"></script>
+<script>
+    const burger = document.getElementById('burgerBtn');
+    const menu = document.getElementById('mobileMenu');
+    burger.addEventListener('click', () => menu.classList.toggle('open'));
+</script>
+</body>
+</html>

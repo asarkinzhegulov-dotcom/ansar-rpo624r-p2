@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ category.name }}{% endblock %}
+{% block topbar_title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="mobile-cats">
+    <a href="{% url 'all_ads_page' %}" class="mobile-cat-chip {% if not category %}active{% endif %}">🌍 Все</a>
+    {% for cat in categories %}<a href="{% url 'ads_by_category' pk=cat.pk %}" class="mobile-cat-chip {% if category.pk == cat.pk %}active{% endif %}">{{ cat.name }}</a>{% endfor %}
+</div>
+
+<div class="page-content">
+<div class="section-title">{{ category.name }}</div>
+<div class="ad-list">
+{% for ad in ads %}
+<div class="ad-card {% if ad.is_top %}is-vip{% endif %}">
+    <div class="ad-img-wrap">
+        {% if ad.image_url %}<img src="{{ ad.image_url }}" alt="{{ ad.title }}" class="ad-img">
+        {% else %}<div class="ad-placeholder">{% if ad.category.name == "Электроника" %}📱{% elif ad.category.name == "Авто" %}🚗{% elif ad.category.name == "Недвижимость" %}🏠{% elif ad.category.name == "Одежда" %}👗{% elif ad.category.name == "Мебель" %}🛋{% elif ad.category.name == "Работа" %}💼{% elif ad.category.name == "Услуги" %}🔧{% elif ad.category.name == "Животные" %}🐾{% elif ad.category.name == "Спорт" %}⚽{% else %}📦{% endif %}</div>{% endif %}
+    </div>
+    <div class="ad-body">
+        {% if ad.is_top %}<span class="ad-vip-label">★ VIP</span>{% endif %}
+        <div class="ad-title">{{ ad.title }}</div>
+        <div class="ad-price {% if ad.price == 0 %}free{% elif ad.is_top %}gold{% endif %}">{% if ad.price == 0 %}Бесплатно{% else %}{{ ad.price }} ₸{% endif %}</div>
+        <div class="ad-meta"><span>{{ ad.city.name }}</span><span>·</span><span>{{ ad.category.name }}</span><span>·</span><span>{{ ad.created_at|date:"d.m.Y" }}</span></div>
+        <p class="ad-desc">{{ ad.description }}</p>
+        <a href="{% url 'read_ad_page' uuid=ad.uuid %}" class="read-btn">Открыть →</a>
+    </div>
+</div>
+{% empty %}
+<div class="empty-box"><div class="empty-icon">📭</div><h4>Нет объявлений</h4><p>Попробуйте другую категорию</p></div>
+{% endfor %}
+</div>
+</div>
+{% endblock %}

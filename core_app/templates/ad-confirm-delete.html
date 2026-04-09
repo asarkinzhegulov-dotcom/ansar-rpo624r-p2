@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Удалить{% endblock %}
+{% block topbar_title %}Удаление объявления{% endblock %}
+{% block content %}
+<div class="del-wrap">
+<div class="del-card">
+    <div class="del-icon">🗑️</div>
+    <h3>Удалить объявление?</h3>
+    <p>Вы удаляете <strong style="color:var(--text);">«{{ ad.title }}»</strong>. Действие необратимо.</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="del-btns">
+            <a href="{% url 'read_ad_page' uuid=ad.uuid %}" class="btn-cancel-d">Отмена</a>
+            <button type="submit" class="btn-confirm-d">Да, удалить</button>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}

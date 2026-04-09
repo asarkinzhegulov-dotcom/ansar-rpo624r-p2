@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Профиль{% endblock %}
+{% block topbar_title %}Профиль{% endblock %}
+{% block content %}
+<div class="page-content">
+<div class="profile-hero">
+    <div class="profile-ava">{{ user.first_name|first|default:user.username|first|upper }}</div>
+    <div>
+        <div class="profile-name">{{ user.first_name|default:user.username }} {{ user.last_name }}</div>
+        <div class="profile-username">@{{ user.username }} · с {{ user.date_joined|date:"Y" }} года</div>
+    </div>
+</div>
+
+<div class="profile-grid">
+    <div>
+        <div class="block-title">Мои объявления ({{ my_ads.count }})</div>
+        {% for ad in my_ads %}
+        <div class="profile-item">
+            <div style="flex:1;min-width:0;">
+                <a href="{% url 'read_ad_page' uuid=ad.uuid %}">{% if ad.is_top %}<span class="ad-vip-label" style="font-size:9px;margin-right:4px;">VIP</span>{% endif %}{{ ad.title|truncatechars:55 }}</a>
+                <div class="item-price">{% if ad.price == 0 %}Бесплатно{% else %}{{ ad.price }} ₸{% endif %}</div>
+                {% if ad.is_moderated %}<span class="status active">✓ Активно</span>{% else %}<span class="status pending">⏳ На проверке</span>{% endif %}
+            </div>
+            <div class="item-btns">
+                <a href="{% url 'ad_update' uuid=ad.uuid %}" class="ibtn e">✎</a>
+                <a href="{% url 'ad_delete' uuid=ad.uuid %}" class="ibtn d">🗑</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-box"><div class="empty-icon">📝</div><h4>Нет объявлений</h4><p><a href="{% url 'ad_create' %}" style="color:var(--accent);">Подать первое →</a></p></div>
+        {% endfor %}
+    </div>
+    <div>
+        <div class="block-title">Избранное ({{ favorites.count }})</div>
+        {% for fav in favorites %}
+        <div class="profile-item">
+            <div style="flex:1;min-width:0;">
+                <a href="{% url 'read_ad_page' uuid=fav.ad.uuid %}">{{ fav.ad.title|truncatechars:55 }}</a>
+                <div class="item-price">{% if fav.ad.price == 0 %}Бесплатно{% else %}{{ fav.ad.price }} ₸{% endif %}</div>
+                <div style="font-size:11px;color:var(--text3);">{{ fav.ad.city.name }}</div>
+            </div>
+            <a href="{% url 'toggle_favorite' uuid=fav.ad.uuid %}" class="ibtn d">♥</a>
+        </div>
+        {% empty %}
+        <div class="empty-box"><div class="empty-icon">♡</div><h4>Избранное пусто</h4><p>Добавляйте объявления</p></div>
+        {% endfor %}
+    </div>
+</div>
+
+<div style="margin-top:20px;">
+    <a href="{% url 'logout_view' %}" style="color:var(--text3);font-size:13px;font-weight:500;">Выйти из аккаунта →</a>
+</div>
+</div>
+{% endblock %}

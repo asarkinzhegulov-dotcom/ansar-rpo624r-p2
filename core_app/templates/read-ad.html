@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ ad.title }}{% endblock %}
+{% block topbar_title %}{{ ad.title|truncatewords:6 }}{% endblock %}
+
+{% block content %}
+<div class="page-content">
+<div class="read-wrap">
+    <div>
+        {% if ad.image_url %}<img src="{{ ad.image_url }}" alt="{{ ad.title }}" class="read-hero">
+        {% else %}<div class="read-hero-empty">{% if ad.category.name == 'Электроника' %}📱{% elif ad.category.name == 'Авто' %}🚗{% elif ad.category.name == 'Недвижимость' %}🏠{% elif ad.category.name == 'Одежда' %}👗{% elif ad.category.name == 'Мебель' %}🛋{% elif ad.category.name == 'Работа' %}💼{% elif ad.category.name == 'Услуги' %}🔧{% elif ad.category.name == 'Животные' %}🐾{% elif ad.category.name == 'Спорт' %}⚽{% else %}📦{% endif %}</div>{% endif %}
+
+        {% if ad.is_top %}<div style="margin-bottom:12px;"><span class="vip-tag">★ VIP — Топ объявление</span></div>{% endif %}
+        <h1 class="read-title">{{ ad.title }}</h1>
+        <div class="read-meta">
+            <span class="meta-tag cat">{{ ad.category.name }}</span>
+            <span class="meta-tag">📍 {{ ad.city.name }}</span>
+            <span class="meta-tag">🕐 {{ ad.created_at|date:"d.m.Y" }}</span>
+        </div>
+        <p class="read-desc">{{ ad.description }}</p>
+
+        {% if related_ads %}
+        <div class="related-section">
+            <div class="section-title" style="font-size:16px;margin-bottom:14px;">Похожие</div>
+            <div class="related-grid">
+            {% for rel in related_ads %}
+            <div class="rel-card">
+                <a href="{% url 'read_ad_page' uuid=rel.uuid %}">
+                    {% if rel.image_url %}<img src="{{ rel.image_url }}" alt="{{ rel.title }}" class="rel-img">
+                    {% else %}<div class="rel-placeholder">{% if rel.category.name == 'Электроника' %}📱{% elif rel.category.name == 'Авто' %}🚗{% elif rel.category.name == 'Недвижимость' %}🏠{% else %}📦{% endif %}</div>{% endif %}
+                    <div class="rel-price {% if rel.price == 0 %}free{% endif %}">{% if rel.price == 0 %}Бесплатно{% else %}{{ rel.price }} ₸{% endif %}</div>
+                    <h4>{{ rel.title }}</h4>
+                    <div class="rel-city">{{ rel.city.name }}</div>
+                </a>
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="price-panel {% if ad.is_top %}gold-panel{% endif %}">
+        <div class="panel-price {% if ad.price == 0 %}free{% elif ad.is_top %}gold{% endif %}">
+            {% if ad.price == 0 %}Бесплатно{% else %}{{ ad.price }} ₸{% endif %}
+        </div>
+        <div class="author-box">
+            <div class="user-ava" style="width:38px;height:38px;font-size:16px;">{{ ad.author.first_name|first|default:"U" }}</div>
+            <div>
+                <div style="font-weight:700;font-size:13.5px;color:var(--text);">{{ ad.author.first_name }} {{ ad.author.last_name }}</div>
+                <div style="font-size:11.5px;color:var(--text3);">с {{ ad.author.date_joined|date:"Y" }} года</div>
+            </div>
+        </div>
+        <button class="panel-btn primary">📞 Показать номер</button>
+        <a href="{% url 'toggle_favorite' uuid=ad.uuid %}" class="panel-btn fav {% if is_favorite %}active{% endif %}" style="display:flex;">
+            {% if is_favorite %}♥ В избранном{% else %}♡ В избранное{% endif %}
+        </a>
+        {% if request.user == ad.author %}
+        <div class="owner-row">
+            <a href="{% url 'ad_update' uuid=ad.uuid %}" class="owner-btn edit">✎ Редактировать</a>
+            <a href="{% url 'ad_delete' uuid=ad.uuid %}" class="owner-btn del">🗑 Удалить</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<div class="mobile-price-bar">
+    <div class="m-price {% if ad.price == 0 %}free{% elif ad.is_top %}gold{% endif %}">
+        {% if ad.price == 0 %}Бесплатно{% else %}{{ ad.price }} ₸{% endif %}
+    </div>
+    <div class="m-btns">
+        <a href="{% url 'toggle_favorite' uuid=ad.uuid %}" class="m-btn-fav {% if is_favorite %}fav-active{% endif %}">{% if is_favorite %}♥{% else %}♡{% endif %}</a>
+        <button class="m-btn-call">📞 Позвонить</button>
+    </div>
+</div>
+<script>document.body.classList.add('read-page-body');</script>
+{% endblock %}
